@@ -36,7 +36,12 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()  // WHITE_LIST 느낌
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()) // 나머지는 인증 필요
-                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
+                .anonymous(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling((ex-> ex
+                        .authenticationEntryPoint(((request,
+                                                    response,
+                                                    authException) -> response.sendError(401)))));
 
         return http.build();
     }
